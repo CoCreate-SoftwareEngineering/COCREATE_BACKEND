@@ -1,0 +1,5 @@
+{
+    "mongoURI1": "mongodb+srv://matt1:Matt1@aurora-app.i4sbz.mongodb.net/myFirstDatabase?retryWrites=true&w=majority",
+    "mongoURI": "mongodb+srv://matt1:Matt1@aurora-app.i4sbz.mongodb.net/?retryWrites=true&w=majority",
+    "jwtSecret": "coolThings"
+}
