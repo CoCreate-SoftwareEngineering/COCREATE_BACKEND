@@ -55,7 +55,7 @@ io.on("connection", (socket) => {
 		roomIdGlobal = roomId;
 		// console.log("ROOM ID:" + roomIdGlobal);
 		socket.join(roomIdGlobal);
-		console.log("THIS");
+		console.log(roomIdGlobal);
 		// const socketsInRoom = await io.in(roomIdGlobal).fetchSockets();
 		// const room = socket.adapter.rooms[roomIdGlobal];
 		// if (room) {
@@ -64,7 +64,6 @@ io.on("connection", (socket) => {
 		// } else {
 		// 	console.log(`Failed to join room ${roomIdGlobal}`);
 		// }
-		io.to(roomIdGlobal).emit("JOINED", roomId);
 		console.log("Room onboarding complete");
 		// if (!rooms[roomId]) {
 		// 	rooms[roomId] = { users: new Set() };
@@ -80,6 +79,7 @@ io.on("connection", (socket) => {
 		console.log(roomIdGlobal);
 		console.log(data);
 		socket.to(roomIdGlobal).emit("servedElements", data);
+		// socket.broadcast.emit("servedElements", data);
 		console.log("drawing sent to room");
 	});
 });
