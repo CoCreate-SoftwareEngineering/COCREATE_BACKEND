@@ -3,13 +3,21 @@ const app = express();
 const http = require("http");
 const server = http.createServer(app);
 
-const { Server } = require("socket.io");
-const io = new Server(server, {
+// const { Server } = require("socket.io");
+// const io = new Server(server, {
+// 	cors: {
+// 		origin: "http://localhost:3000",
+// 	},
+// });
+
+const io = require("socket.io")(server, {
 	cors: {
 		origin: "http://localhost:3000",
+		methods: ["GET", "POST"],
+		allowedHeaders: ["my-custom-header"],
+		credentials: true,
 	},
 });
-
 // io.listen(8000);
 
 const connectDB = require("./config/db");
@@ -36,23 +44,42 @@ app.get("/", (req, res) => {
 	res.send("server");
 });
 
+const rooms = {};
+
 let canvasElementsGlobal, roomIdGlobal;
 io.on("connection", (socket) => {
 	console.log("User Connected");
-	socket.on("userJoined", (data) => {
+	socket.on("userJoined", async (data) => {
 		console.log("User has joined a room");
 		const { roomId, userId, userName, host, presenter } = data;
 		roomIdGlobal = roomId;
-		console.log("ROOM ID:" + roomIdGlobal);
+		// console.log("ROOM ID:" + roomIdGlobal);
 		socket.join(roomIdGlobal);
+		console.log(roomIdGlobal);
+		// const socketsInRoom = await io.in(roomIdGlobal).fetchSockets();
+		// const room = socket.adapter.rooms[roomIdGlobal];
+		// if (room) {
+		// 	console.log(`Socket ${socket.id} has joined room ${roomIdGlobal}`);
+		// 	console.log(`Number of sockets in room ${roomIdGlobal}: ${room.length}`);
+		// } else {
+		// 	console.log(`Failed to join room ${roomIdGlobal}`);
+		// }
 		console.log("Room onboarding complete");
+		// if (!rooms[roomId]) {
+		// 	rooms[roomId] = { users: new Set() };
+		// 	console.log(`Room ${roomId} created`);
+		// }
+		// rooms[roomId].users.add(socket.id);
+		// console.log(`User ${socket.id} added to room ${roomId}`);
 	});
 	socket.on("elements", (data) => {
 		console.log("received drawing");
-		canvasElementsGlobal = data;
-		console.log(canvasElementsGlobal);
+		// canvasElementsGlobal = data;
+		// console.log(canvasElementsGlobal);
 		console.log(roomIdGlobal);
-		socket.to(roomIdGlobal).emit("servedElements", { canvasElementsGlobal });
+		console.log(data);
+		socket.to(roomIdGlobal).emit("servedElements", data);
+		// socket.broadcast.emit("servedElements", data);
 		console.log("drawing sent to room");
 	});
 });

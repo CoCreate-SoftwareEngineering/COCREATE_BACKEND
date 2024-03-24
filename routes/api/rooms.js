@@ -10,8 +10,6 @@ const Room = require("../../models/Room");
 // Endpoint to add a new room
 router.post("/", async (req, res) => {
 	try {
-		console.log("Trying to add new room");
-		console.log(req.body);
 		const { roomId, roomName, elements } = req.body;
 		// Create a new room
 		const newRoom = new Room({
@@ -19,8 +17,6 @@ router.post("/", async (req, res) => {
 			roomName,
 			elements,
 		});
-
-		console.log(newRoom);
 
 		// Save the new room to the database
 		await newRoom.save();

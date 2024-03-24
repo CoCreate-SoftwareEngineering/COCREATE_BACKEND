@@ -115,12 +115,11 @@ router.put("/location", [auth], async (req, res) => {
 // @access Private
 router.put("/rooms", [auth], async (req, res) => {
 	const room = req.body;
-	console.log(room);
+
 	const newRoom = room;
 	try {
 		const profile = await Profile.findOne({ user: req.user.id });
 		profile.rooms.push(newRoom);
-		console.log("push new room");
 
 		await profile.save();
 
