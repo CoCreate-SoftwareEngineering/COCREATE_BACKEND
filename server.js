@@ -46,16 +46,35 @@ app.get("/", (req, res) => {
 
 const rooms = {};
 
+const getAllUsers = (room) => {
+	const adapter = io.sockets.adapter; // Get the adapter for the default namespace
+
+    // Check if adapter and rooms are available
+    if (adapter && adapter.rooms) {
+        // Get the IDs of all sockets in the room
+        const roomSockets = adapter.rooms.get(room);
+        if (roomSockets) {
+            return Array.from(roomSockets); // Convert Set to Array
+        } else {
+            return [];
+        }
+    } else {
+        return [];
+    }
+}
+
 let canvasElementsGlobal, roomIdGlobal;
 io.on("connection", (socket) => {
 	console.log("User Connected");
+	socket.emit("me", socket.id)
 	socket.on("userJoined", async (data) => {
 		console.log("User has joined a room");
 		const { roomId, userId, userName, host, presenter } = data;
 		roomIdGlobal = roomId;
 		// console.log("ROOM ID:" + roomIdGlobal);
 		socket.join(roomIdGlobal);
-		console.log(roomIdGlobal);
+		console.log("All sockets now in room " + roomId + ": " + getAllUsers(roomId))
+		//console.log(roomIdGlobal);
 		// const socketsInRoom = await io.in(roomIdGlobal).fetchSockets();
 		// const room = socket.adapter.rooms[roomIdGlobal];
 		// if (room) {
