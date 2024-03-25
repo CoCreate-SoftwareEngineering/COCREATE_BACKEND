@@ -32,4 +32,72 @@ router.post("/", async (req, res) => {
 	}
 });
 
+router.put("/", [auth], async (req, res) => {
+	const { elements, roomId } = req.body;
+	console.log(req.body);
+	// const newRoom = room;
+	try {
+		await Room.updateOne({ roomId: roomId }, { $set: { elements: elements } });
+		console.log("elements saved");
+	} catch (err) {
+		console.error(err.message);
+		res.status(400).send("Server Error");
+	}
+});
+
+router.get("/:roomId", async (req, res) => {
+	try {
+		const roomId = req.params.roomId;
+		console.log("ROOM ID");
+		console.log(roomId);
+		// const roomId = "345f711c-5c5d-0f8a-7ab9-256b20664823";
+		const room = await Room.findOne({ roomId: roomId });
+		console.log("GET ROOM: ");
+
+		if (!room) {
+			return res.status(400).json({ msg: "There is no profile for this user" });
+		}
+
+		res.json(room);
+	} catch (err) {
+		console.error(err.message);
+		res.status(500).send("Server error");
+	}
+});
+
+router.put("/name", [auth], async (req, res) => {
+	const { roomId, roomName } = req.body;
+	console.log(req.body);
+	// const newRoom = room;
+	try {
+		await Room.updateOne({ roomId: roomId }, { $set: { roomName: roomName } });
+		console.log("elements saved");
+	} catch (err) {
+		console.error(err.message);
+		res.status(400).send("Server Error");
+	}
+});
+
+router.get("/", [auth], async (req, res) => {
+	// console.log(req.user.id);
+	console.log("START GET NAMES");
+	try {
+		const roomNames = [];
+		const profile = await Profile.findOne({ user: req.user.id });
+		console.log(profile.roomIds);
+		for (let i = 0; i < profile.roomIds.length; i++) {
+			const room = await Room.findOne({ roomId: profile.roomIds[i] });
+			roomNames.push(room.roomName);
+		}
+		console.log("ROOM NAMES");
+		console.log(roomNames);
+
+		res.json(roomNames);
+	} catch (err) {
+		console.log("GET NAMES ERROR");
+		console.error(err.message);
+		res.status(500).send("Server error");
+	}
+});
+
 module.exports = router;

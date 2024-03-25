@@ -5,16 +5,10 @@ const ProfileSchema = new mongoose.Schema({
 		type: mongoose.Schema.Types.ObjectId,
 		ref: "user",
 	},
-	rooms: [
+	roomIds: [
 		{
-			roomId: {
-				type: String, // Assuming roomId is a string, adjust as needed
-				required: true,
-			},
-			roomName: {
-				type: String, // Assuming roomName is a string, adjust as needed
-				required: true,
-			},
+			type: String, // Assuming roomId is a string, adjust as needed
+			required: true,
 		},
 	],
 });

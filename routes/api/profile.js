@@ -116,14 +116,38 @@ router.put("/location", [auth], async (req, res) => {
 router.put("/rooms", [auth], async (req, res) => {
 	const room = req.body;
 
-	const newRoom = room;
+	const newRoomId = room.roomId;
 	try {
 		const profile = await Profile.findOne({ user: req.user.id });
-		profile.rooms.push(newRoom);
+		profile.roomIds.push(newRoomId);
 
 		await profile.save();
 
 		res.json(profile);
+	} catch (err) {
+		console.error(err.message);
+		res.status(400).send("Server Error");
+	}
+});
+router.put("/rooms/addMember", [auth], async (req, res) => {
+	const { roomId, email } = req.body;
+
+	try {
+		console.log("RECIEVED ADD MEMBER");
+		const room = await Room.findOne({ roomId: roomId });
+		const user = await User.findOne({ email: email });
+		console.log(user);
+		const profile = await Profile.findOne({ user: user.id });
+		console.log("ADD MEMBER ACTION");
+		console.log(room);
+		console.log(user.id);
+		console.log(user.firstName);
+		profile.rooms.push(room);
+		console.log(profile.rooms);
+
+		await profile.save();
+
+		res.json(room);
 	} catch (err) {
 		console.error(err.message);
 		res.status(400).send("Server Error");
