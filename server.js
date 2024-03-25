@@ -72,6 +72,8 @@ io.on("connection", (socket) => {
 		const { roomId, userId, userName, host, presenter } = data;
 		roomIdGlobal = roomId;
 		// console.log("ROOM ID:" + roomIdGlobal);
+		console.log("sending users in room..")
+		socket.emit("roomUsers", (getAllUsers(roomId)))
 		socket.join(roomIdGlobal);
 		console.log("All sockets now in room " + roomId + ": " + getAllUsers(roomId))
 		//console.log(roomIdGlobal);
@@ -91,6 +93,17 @@ io.on("connection", (socket) => {
 		// rooms[roomId].users.add(socket.id);
 		// console.log(`User ${socket.id} added to room ${roomId}`);
 	});
+
+	socket.on("callUser", (data) => {
+		console.log(`Forwarding call message from user ${data.from} to ${data.to}`)
+		io.to(data.userToCall).emit("callUser", { signal: data.signalData, from: data.from })
+	})
+
+	socket.on("answerCall", (data) => {
+		console.log(`Forwarding answer message from user ${data.from} to ${data.to}`)
+		io.to(data.to).emit("callAccepted", data.signal)
+	})
+
 	socket.on("elements", (data) => {
 		console.log("received drawing");
 		// canvasElementsGlobal = data;
