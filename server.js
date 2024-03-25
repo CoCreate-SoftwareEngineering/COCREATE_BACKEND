@@ -51,26 +51,11 @@ io.on("connection", (socket) => {
 	console.log("User Connected");
 	socket.on("userJoined", async (data) => {
 		console.log("User has joined a room");
-		const { roomId, userId, userName, host, presenter } = data;
-		roomIdGlobal = roomId;
-		// console.log("ROOM ID:" + roomIdGlobal);
+		roomIdGlobal = data;
 		socket.join(roomIdGlobal);
-		console.log(roomIdGlobal);
-		// const socketsInRoom = await io.in(roomIdGlobal).fetchSockets();
-		// const room = socket.adapter.rooms[roomIdGlobal];
-		// if (room) {
-		// 	console.log(`Socket ${socket.id} has joined room ${roomIdGlobal}`);
-		// 	console.log(`Number of sockets in room ${roomIdGlobal}: ${room.length}`);
-		// } else {
-		// 	console.log(`Failed to join room ${roomIdGlobal}`);
-		// }
+		console.log(data);
+
 		console.log("Room onboarding complete");
-		// if (!rooms[roomId]) {
-		// 	rooms[roomId] = { users: new Set() };
-		// 	console.log(`Room ${roomId} created`);
-		// }
-		// rooms[roomId].users.add(socket.id);
-		// console.log(`User ${socket.id} added to room ${roomId}`);
 	});
 	socket.on("elements", (data) => {
 		console.log("received drawing");

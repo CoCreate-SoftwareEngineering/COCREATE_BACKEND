@@ -10,7 +10,7 @@ const RoomSchema = new mongoose.Schema({
 		required: true,
 	},
 	elements: {
-		type: [Object],
+		type: Object,
 		required: true,
 	},
 });
