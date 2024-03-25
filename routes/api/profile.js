@@ -136,18 +136,25 @@ router.put("/rooms/addMember", [auth], async (req, res) => {
 		console.log("RECIEVED ADD MEMBER");
 		const room = await Room.findOne({ roomId: roomId });
 		const user = await User.findOne({ email: email });
+		if (!user) {
+			console.log("Cant find user");
+			return res.status(400).json({ msg: "There is no user with this email" });
+		}
 		console.log(user);
+		console.log(user.id);
 		const profile = await Profile.findOne({ user: user.id });
 		console.log("ADD MEMBER ACTION");
 		console.log(room);
-		console.log(user.id);
+		console.log(profile);
 		console.log(user.firstName);
-		profile.rooms.push(room);
-		console.log(profile.rooms);
+		profile.roomIds.push(room.id);
+		room.members.push(email);
+		console.log(room);
 
 		await profile.save();
+		await room.save();
 
-		res.json(room);
+		return res.json(room.members);
 	} catch (err) {
 		console.error(err.message);
 		res.status(400).send("Server Error");

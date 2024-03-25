@@ -13,5 +13,11 @@ const RoomSchema = new mongoose.Schema({
 		type: Object,
 		required: true,
 	},
+	members: [
+		{
+			type: String,
+			required: true,
+		},
+	],
 });
 module.exports = Room = mongoose.model("room", RoomSchema);
