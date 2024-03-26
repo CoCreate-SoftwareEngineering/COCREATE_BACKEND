@@ -46,9 +46,64 @@ app.get("/", (req, res) => {
 
 const rooms = {};
 
+//KACPER WUZ HEER
+var STATIC_CHANNELS = [{
+    name: 'Global chat',
+    participants: 0,
+    id: 1,
+    sockets: []
+}, {
+    name: 'Funny',
+    participants: 0,
+    id: 2,
+    sockets: []
+}];
+//KACPER ESCAPES
+
 let canvasElementsGlobal, roomIdGlobal;
 io.on("connection", (socket) => {
 	console.log("User Connected");
+
+	//KACPER WUZ HEER
+	socket.emit('MsgConnection', null);
+
+	socket.on('channel-join', id => {
+		console.log('channel join', id);
+		STATIC_CHANNELS.forEach(c => {
+			if (c.id === id) {
+				if (c.sockets.indexOf(socket.id) == (-1)) {
+					c.sockets.push(socket.id);
+					c.participants++;
+					io.emit('channel', c);
+				}
+			} else {
+				let index = c.sockets.indexOf(socket.id);
+				if (index != (-1)) {
+					c.sockets.splice(index, 1);
+					c.participants--;
+					io.emit('channel', c);
+				}
+			}
+		});
+
+		return id;
+	});
+	socket.on('send-message', message => {
+		io.emit('message', message);
+	});
+
+	socket.on('disconnect', () => {
+		STATIC_CHANNELS.forEach(c => {
+			let index = c.sockets.indexOf(socket.id);
+			if (index != (-1)) {
+				c.sockets.splice(index, 1);
+				c.participants--;
+				io.emit('channel', c);
+			}
+		});
+	});
+	//KACPER ESCAPES
+
 	socket.on("userJoined", async (data) => {
 		console.log("User has joined a room");
 		roomIdGlobal = data;
@@ -105,3 +160,13 @@ app.use("/api/rooms", require("./routes/api/rooms"));
 
 const PORT = process.env.PORT || 8000;
 server.listen(PORT, () => console.log(`Server started on port ${PORT}`));
+
+//KACPER LEAVES HIS MARK BELOW!!!!!!!!
+/**
+ * @description This methos retirves the static channels
+ */
+app.get('/getChannels', (req, res) => {
+    res.json({
+        channels: STATIC_CHANNELS
+    })
+});
