@@ -60,6 +60,24 @@ var STATIC_CHANNELS = [{
 }];
 //KACPER ESCAPES
 
+const getAllUsers = (room) => {
+	const adapter = io.sockets.adapter; // Get the adapter for the default namespace
+
+    // Check if adapter and rooms are available
+    if (adapter && adapter.rooms) {
+        // Get the IDs of all sockets in the room
+        const roomSockets = adapter.rooms.get(room);
+        if (roomSockets) {
+            return Array.from(roomSockets); // Convert Set to Array
+        } else {
+            return [];
+        }
+    } else {
+        return [];
+    }
+}
+
+
 let canvasElementsGlobal, roomIdGlobal;
 io.on("connection", (socket) => {
 	console.log("User Connected");
@@ -107,6 +125,8 @@ io.on("connection", (socket) => {
 	socket.on("userJoined", async (data) => {
 		console.log("User has joined a room");
 		roomIdGlobal = data;
+		console.log("sending users in room..")
+	socket.emit("roomUsers", (getAllUsers(roomIdGlobal))) //send all users that were already in room before joining ourseles
 		socket.join(roomIdGlobal);
 		console.log(data);
 
