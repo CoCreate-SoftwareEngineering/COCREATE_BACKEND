@@ -23,6 +23,8 @@ const io = require("socket.io")(server, {
 const connectDB = require("./config/db");
 const cors = require("cors");
 
+const socketUsernameMap = {}
+
 connectDB();
 
 // Init Middleware
@@ -126,8 +128,9 @@ io.on("connection", (socket) => {
 		console.log("User has joined a room");
 		roomIdGlobal = data;
 		console.log("sending users in room..")
-	socket.emit("roomUsers", (getAllUsers(roomIdGlobal))) //send all users that were already in room before joining ourseles
+		socket.emit("roomUsers", (getAllUsers(roomIdGlobal))) //send all users that were already in room before joining ourseles
 		socket.join(roomIdGlobal);
+		console.log("users now in " + roomIdGlobal + ": " + getAllUsers(roomIdGlobal))
 		console.log(data);
 
 		console.log("Room onboarding complete");
