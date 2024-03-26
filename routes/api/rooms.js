@@ -99,5 +99,44 @@ router.get("/", [auth], async (req, res) => {
 		res.status(500).send("Server error");
 	}
 });
+router.put("/addMember", [auth], async (req, res) => {
+	const { roomId } = req.body;
+	console.log("ADDING MEMBER");
+	console.log(req.user.id);
+	// const newRoom = room;
+	try {
+		const user = await User.findOne({ user: req.user.id });
+		const room = await Room.findOne({ roomId: roomId });
+		console.log(user.email);
+		room.members.push(user.email);
+		console.log("Member added");
+		console.log(room.members);
+		await room.save();
+		return res.json(room.members);
+	} catch (err) {
+		console.error(err.message);
+		res.status(400).send("Server Error");
+	}
+});
+// router.put("/addMemberFromSettings", [auth], async (req, res) => {
+// 	const { roomId, email } = req.body;
+// 	console.log("ADDING MEMBER");
+// 	// const newRoom = room;
+// 	try {
+// 		const user = await User.findOne({ email: email });
+// 		if (!user) {
+// 			return res.status(400).json({ msg: "There is no user with this email" });
+// 		}
+// 		const room = await Room.findOne({ roomId: roomId });
+// 		console.log(user.email);
+// 		room.members.push(user.email);
+// 		console.log("Member added");
+// 		console.log(room.members);
+// 		return res.json(room.members);
+// 	} catch (err) {
+// 		console.error(err.message);
+// 		res.status(400).send("Server Error");
+// 	}
+// });
 
 module.exports = router;
