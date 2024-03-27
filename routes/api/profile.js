@@ -115,7 +115,7 @@ router.put("/location", [auth], async (req, res) => {
 // @access Private
 router.put("/rooms", [auth], async (req, res) => {
 	const room = req.body;
-
+	console.log("Putting room");
 	const newRoomId = room.roomId;
 	try {
 		const profile = await Profile.findOne({ user: req.user.id });
@@ -147,7 +147,7 @@ router.put("/rooms/addMember", [auth], async (req, res) => {
 		console.log(room);
 		console.log(profile);
 		console.log(user.firstName);
-		profile.roomIds.push(room.id);
+		profile.roomIds.push(room.roomId);
 		room.members.push(email);
 		console.log(room);
 
@@ -195,8 +195,11 @@ router.put("/rooms/leaveRoom/:roomId", [auth], async (req, res) => {
 		console.log("ROOM MEMBERS:");
 		console.log(room.members);
 
-		await profile.save();
-		await room.save();
+		// await profile.save();
+		// await room.save();
+
+		return res.json({ rooms: profile.rooms, members: room.members });
+
 
 		res.json({ rooms: profile.rooms, members: rooms.members });
 	} catch (err) {
