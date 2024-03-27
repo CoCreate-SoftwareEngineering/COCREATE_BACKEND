@@ -112,7 +112,23 @@ io.on("connection", (socket) => {
 		io.emit('message', message);
 	});
 
+	socket.on("chatMessage", (data) => {
+		io.to(data.room).emit("chatMessage", data.message)
+	})
+	//Call message forwarding
+	socket.on("callUser", (data) => {
+		console.log("User " + data.from + " is calling user " + data.userToCall)
+		console.log(getAllUsers(data.room))
+		io.to(data.userToCall).emit("callUser", { signal: data.signalData, from: data.from })
+	})
+
+	socket.on("answerCall", (data) => {
+		io.to(data.to).emit("callAccepted", data.signal)
+	})
+	
+
 	socket.on('disconnect', () => {
+		console.log("socket " + socket.id + " disconnected")
 		STATIC_CHANNELS.forEach(c => {
 			let index = c.sockets.indexOf(socket.id);
 			if (index != (-1)) {
@@ -128,13 +144,20 @@ io.on("connection", (socket) => {
 		console.log("User has joined a room");
 		roomIdGlobal = data;
 		console.log("sending users in room..")
-		socket.emit("roomUsers", (getAllUsers(roomIdGlobal))) //send all users that were already in room before joining ourseles
 		socket.join(roomIdGlobal);
+		const usersInRoom = getAllUsers(roomIdGlobal)
+		usersInRoom.forEach((userId) => {
+			io.to(userId).emit("roomUsers", usersInRoom.filter((id) => id !== userId))
+		})
+		//socket.to(roomIdGlobal).emit("roomUsers", (getAllUsers(roomIdGlobal))) //broadcast new room users, will have to filter out self
 		console.log("users now in " + roomIdGlobal + ": " + getAllUsers(roomIdGlobal))
 		console.log(data);
 
 		console.log("Room onboarding complete");
 	});
+	socket.on("leaveRoom", (data) => {
+		console.log(data.who + "left room " + data.room)
+	})
 	socket.on("elements", (data) => {
 		console.log("received drawing");
 		// canvasElementsGlobal = data;
