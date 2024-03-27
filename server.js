@@ -12,7 +12,7 @@ const server = http.createServer(app);
 
 const io = require("socket.io")(server, {
 	cors: {
-		origin: "https://cocreate-softwareengineering.github.io/CoCreate",
+		origin: "https://cocreate-softwareengineering.github.io",
 		methods: ["GET", "POST"],
 		allowedHeaders: ["my-custom-header"],
 		credentials: true,
