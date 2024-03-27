@@ -200,6 +200,7 @@ router.put("/rooms/leaveRoom/:roomId", [auth], async (req, res) => {
 
 		return res.json({ rooms: profile.rooms, members: room.members });
 
+
 		res.json({ rooms: profile.rooms, members: rooms.members });
 	} catch (err) {
 		console.error(err.message);
