@@ -70,8 +70,14 @@ router.put("/name", [auth], async (req, res) => {
 	console.log(req.body);
 	// const newRoom = room;
 	try {
-		await Room.updateOne({ roomId: roomId }, { $set: { roomName: roomName } });
+		const room = await Room.updateOne(
+			{ roomId: roomId },
+			{ $set: { roomName: roomName } }
+		);
 		console.log("elements saved");
+		// await room.save();
+		console.log(roomName);
+		return res.json(roomName);
 	} catch (err) {
 		console.error(err.message);
 		res.status(400).send("Server Error");
@@ -87,6 +93,7 @@ router.get("/", [auth], async (req, res) => {
 		console.log(profile.roomIds);
 		for (let i = 0; i < profile.roomIds.length; i++) {
 			const room = await Room.findOne({ roomId: profile.roomIds[i] });
+			console.log(room);
 			roomNames.push(room.roomName);
 		}
 		console.log("ROOM NAMES");
@@ -100,15 +107,15 @@ router.get("/", [auth], async (req, res) => {
 	}
 });
 router.put("/addMember", [auth], async (req, res) => {
-	const { roomId } = req.body;
+	const { roomId, email } = req.body;
 	console.log("ADDING MEMBER");
 	console.log(req.user.id);
 	// const newRoom = room;
 	try {
-		const user = await User.findOne({ user: req.user.id });
+		// const user = await User.findOne({ user: req.user.id });
 		const room = await Room.findOne({ roomId: roomId });
-		console.log(user.email);
-		room.members.push(user.email);
+		console.log(email);
+		room.members.push(email);
 		console.log("Member added");
 		console.log(room.members);
 		await room.save();

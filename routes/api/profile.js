@@ -115,7 +115,7 @@ router.put("/location", [auth], async (req, res) => {
 // @access Private
 router.put("/rooms", [auth], async (req, res) => {
 	const room = req.body;
-
+	console.log("Putting room");
 	const newRoomId = room.roomId;
 	try {
 		const profile = await Profile.findOne({ user: req.user.id });
@@ -147,7 +147,7 @@ router.put("/rooms/addMember", [auth], async (req, res) => {
 		console.log(room);
 		console.log(profile);
 		console.log(user.firstName);
-		profile.roomIds.push(room.id);
+		profile.roomIds.push(room.roomId);
 		room.members.push(email);
 		console.log(room);
 
@@ -164,19 +164,43 @@ router.put("/rooms/addMember", [auth], async (req, res) => {
 // @route DELETE api/profile/locations/:location
 // @desc Delete location
 // @access Private
-router.delete("/location/:locationId", auth, async (req, res) => {
+router.put("/rooms/leaveRoom/:roomId", [auth], async (req, res) => {
 	try {
-		const profile = await Profile.findOne({ user: req.user.id });
+		console.log("Leaving room");
+		const roomId = req.params.roomId;
+		const userId = req.user.id;
+		// const profile = await Profile.findOne({ user: req.user.id });
+		// const room = await Room.findOne({ roomId: roomId });
+		const user = await User.findOne({ user: req.user.id });
 
-		const removeIndex = profile.locations.indexOf(req.params.locationId);
+		const room = await Room.updateOne(
+			{ roomId: roomId }, // Match documents where the member's email exists in the members array
+			{ $pull: { members: user.email } } // Pull the matching email from the members array
+		);
+		console.log("New members");
+		console.log(room.members);
+		console.log(roomId);
 
-		console.log(removeIndex);
+		const profile = await Profile.updateOne(
+			{ user: userId }, // Match documents where the member's email exists in the members array
+			{ $pull: { roomIds: roomId } } // Pull the matching email from the members array
+		);
 
-		profile.locations.splice(removeIndex, 1);
+		// const removeIndexRoom = Room.members.indexOf(req.params.roomId);
+		// const removeIndex = profile.rooms.indexOf(user.email);
+		console.log(profile);
 
-		await profile.save();
+		console.log("MY Rooms:");
+		console.log(profile.rooms);
+		console.log("ROOM MEMBERS:");
+		console.log(room.members);
 
-		res.json(profile);
+		// await profile.save();
+		// await room.save();
+
+		return res.json({ rooms: profile.rooms, members: room.members });
+
+		res.json({ rooms: profile.rooms, members: rooms.members });
 	} catch (err) {
 		console.error(err.message);
 		res.status(400).send("Server Error");
